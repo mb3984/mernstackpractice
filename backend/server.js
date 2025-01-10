@@ -13,7 +13,7 @@ app.use(cors());
 mongoose
   .connect(mongo_uri)
   .then(() => {
-    console.log("mognodb connected succesfully");
+    console.log("mognoDB connected succesfully");
   })
   .catch((error) => {
     console.log("connection error");

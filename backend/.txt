@@ -86,3 +86,6 @@ app.post("/login", async (request, response) => {
     process.exit(1);
   }
 });
+
+mongo_conn="mongodb+srv://madhu:madhu12@mern.wdmck.mongodb.net/authentication?retryWrites=true&w=majority&appName=mern"
+PORT=4000
