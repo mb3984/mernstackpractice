@@ -1,0 +1,88 @@
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
+const mongoUri = process.env.connectionString;
+const PORT = process.env.PORT;
+
+const app = express();
+
+app.use(express.json());
+app.use(cors());
+
+console.log("MongoDB URI:", mongoUri);
+
+let client; // Declare the client variable
+
+mongoose
+  .connect(mongoUri)
+  .then(() => {
+    console.log("MongoDB connected successfully");
+
+    // Assign the MongoDB client to the variable
+    client = mongoose.connection.getClient();
+
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+
+//register
+app.post("/register", async (request, response) => {
+  try {
+    const userDetails = request.body;
+    const { username, email, password } = userDetails;
+    const collection = client.db("authentication").collection("users");
+    const user = await collection.findOne({ email });
+    if (user) {
+      return response.status(409).json({
+        message: "user is already exist",
+        success: false,
+      });
+    } else {
+      const hashedPassword = await bcrypt.hash(userDetails.password, 10);
+      userDetails.password = hashedPassword;
+      const result = await collection.insertOne(userDetails);
+      response
+        .status(200)
+        .json({ message: "signup succesfully", success: true });
+      console.log("signup succesful");
+      console.log(userDetails);
+    }
+  } catch (error) {
+    console.log("registration error");
+    process.exit(1);
+  }
+});
+
+//login
+app.post("/login", async (request, response) => {
+  try {
+    const collection = client.db("authentication").collection("users");
+    const { email, password } = request.body;
+    const user = await collection.findOne({ email });
+    if (!user) {
+      return response.status(401).json({ message: "Email doesnot exist" });
+    } else {
+      const isPasswordEqual = await bcrypt.compare(password, user.password);
+      if (!isPasswordEqual) {
+        return res.status(403).send({ message: "wrong password" });
+      }
+      const jwtToken = jwt.sign({ _id: user._id }, "my_secret");
+      response
+        .status(200)
+        .send({ jwtToken: TokenExpiredError, userId: user._id });
+      console.log("user login succesfully");
+    }
+  } catch (error) {
+    console.log("login error");
+    process.exit(1);
+  }
+});

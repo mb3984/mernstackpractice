@@ -1,0 +1,35 @@
+POST http://localhost:4000/save/todo
+Content-Type: application/json
+
+{
+    "text":"go to interview",
+    "completed":true
+}
+###
+POST http://localhost:4000/save/todo
+Content-Type: application/json
+
+{
+    "text":"go to gim",
+    "completed":true
+}
+###
+POST http://localhost:4000/save/todo
+Content-Type: application/json
+
+{
+    "text":"go to movie",
+    "completed":true
+}
+###
+PUT http://localhost:4000/update/todo
+Content-Type: application/json
+
+{
+    "_id":"677fdd3f96cdc51a7c9041a5",
+    "text":"Go to Interview Tomorrow"
+}
+###
+GET http://localhost:4000/get/todos
+###
+DELETE http://localhost:4000/delete/677fe0fa988511724afc046c
